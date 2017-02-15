@@ -4,7 +4,7 @@ set(CMAKE_VERBOSE_MAKEFILE on)
 include_directories(/home/jaycee/workspace/openal/openal-src/openal-soft/include )
 
 add_library(openal SHARED IMPORTED )
-set_target_properties(openal PROPERTIES IMPORTED_LOCATION /home/jaycee/AndroidStudioProjects/TargetFinder/app/src/main/jniLibs/${ANDROID_ABI}/libopenal.so )
+set_target_properties(openal PROPERTIES IMPORTED_LOCATION /home/jaycee/AndroidStudioProjects/TargetFinder/app/src/main/cpp/lib/${ANDROID_ABI}/libopenal.so )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -v -I /home/jaycee/AndroidStudioProjects/TargetFinder/app/src/main/cpp/include")
 
