@@ -82,22 +82,7 @@ public class ActivityCamera extends Activity
                         ArrayList<TangoCoordinateFramePair> framePairList = new ArrayList<>();
                         framePairList.add(new TangoCoordinateFramePair(TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE, TangoPoseData.COORDINATE_FRAME_DEVICE));
 
-                        tango.connectListener(framePairList, new Tango.TangoUpdateCallback()
-                        {
-                            @Override
-                            public void onFrameAvailable(int cameraId)
-                            {
-                                if (cameraId == TangoCameraIntrinsics.TANGO_CAMERA_COLOR)
-                                {
-                                    if (surfaceView.getRenderMode() != GLSurfaceView.RENDERMODE_WHEN_DIRTY)
-                                    {
-                                        surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-                                    }
-                                    frameAvailableTangoThread.set(true);
-                                    surfaceView.requestRender();
-                                }
-                            }
-                        });
+                        tango.connectListener(framePairList, new ClassTangoUpdateCallback(ActivityCamera.this));
 
                         tango.connect(tangoConfig);
                         tangoConnected = true;
@@ -161,4 +146,5 @@ public class ActivityCamera extends Activity
     public AtomicBoolean getFrameAvailableTangoThread() { return this.frameAvailableTangoThread; }
     public int getConnectedTextureIdGlThread() { return this.connectedTextureIdGlThread; }
     public void setConnectedTextureIdGlThread(int connectedTextureIdGlThread) { this.connectedTextureIdGlThread = connectedTextureIdGlThread; }
+    public RajawaliSurfaceView getSurfaceView() { return this.surfaceView; }
 }
