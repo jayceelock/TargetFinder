@@ -34,5 +34,6 @@ class ClassTangoUpdateCallback extends Tango.TangoUpdateCallback
     public void onPoseAvailable(TangoPoseData pose)
     {
         activityCamera.getRunnableSoundGenerator().setTangoPose(pose);
+        activityCamera.getRunnableSpeechGenerator().setTangoPose(pose);
     }
 }

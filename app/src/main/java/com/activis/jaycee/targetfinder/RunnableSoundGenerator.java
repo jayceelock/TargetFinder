@@ -6,6 +6,8 @@ import android.util.Log;
 import com.google.atap.tangoservice.TangoException;
 import com.google.atap.tangoservice.TangoPoseData;
 
+import static java.lang.Thread.sleep;
+
 public class RunnableSoundGenerator implements Runnable
 {
     private static final String TAG = RunnableSoundGenerator.class.getSimpleName();
@@ -55,6 +57,16 @@ public class RunnableSoundGenerator implements Runnable
             tempList[0] = (float)xPositionListener;
 
             JNINativeInterface.play(tempSrc, tempList, gain, pitch);
+
+            try
+            {
+                sleep((long) activityCamera.getInterfaceParameters().getVoiceTiming());
+            }
+
+            catch(InterruptedException e)
+            {
+                Log.e(TAG, "Error in thread sleep: " + e);
+            }
 
             running = false;
         }

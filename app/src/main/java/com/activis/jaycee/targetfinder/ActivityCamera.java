@@ -3,6 +3,7 @@ package com.activis.jaycee.targetfinder;
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import com.google.atap.tangoservice.Tango;
@@ -18,9 +19,10 @@ import com.projecttango.tangosupport.TangoSupport;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ActivityCamera extends Activity
+public class ActivityCamera extends Activity implements TextToSpeech.OnInitListener
 {
     private static final String TAG = ActivityCamera.class.getSimpleName();
     private static final int INVALID_TEXTURE_ID = 0;
@@ -35,11 +37,13 @@ public class ActivityCamera extends Activity
     private TangoCameraIntrinsics tangoCameraIntrinsics;
 
     private RajawaliSurfaceView surfaceView;
-    private ClassRenderer renderer;
+    private TextToSpeech tts;
 
     private ClassFrameCallback sceneFrameCallback = new ClassFrameCallback(ActivityCamera.this);
     private RunnableSoundGenerator runnableSoundGenerator = new RunnableSoundGenerator(ActivityCamera.this);
+    private RunnableSpeechGenerator runnableSpeechGenerator = new RunnableSpeechGenerator(ActivityCamera.this);
     private ClassInterfaceParameters interfaceParameters;
+    private ClassRenderer renderer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -51,6 +55,8 @@ public class ActivityCamera extends Activity
         renderer = new ClassRenderer(this);
 
         interfaceParameters = new ClassInterfaceParameters(ActivityCamera.this);
+        tts = new TextToSpeech(getApplicationContext(), this);
+
 
         renderer.getCurrentScene().registerFrameCallback(sceneFrameCallback);
         surfaceView.setSurfaceRenderer(renderer);
@@ -140,7 +146,23 @@ public class ActivityCamera extends Activity
                 }
             }
         }
+
+        if(tts.isSpeaking())
+        {
+            tts.shutdown();
+            tts.stop();
+        }
+
         super.onPause();
+    }
+
+    @Override
+    public void onInit(int status)
+    {
+        if (status == TextToSpeech.SUCCESS)
+        {
+            tts.setLanguage(Locale.UK);
+        }
     }
 
     public Tango getTango(){ return this.tango; }
@@ -153,4 +175,6 @@ public class ActivityCamera extends Activity
     public RajawaliSurfaceView getSurfaceView() { return this.surfaceView; }
     public ClassInterfaceParameters getInterfaceParameters() { return this.interfaceParameters; }
     public RunnableSoundGenerator getRunnableSoundGenerator() { return this.runnableSoundGenerator; }
+    public RunnableSpeechGenerator getRunnableSpeechGenerator() { return this.runnableSpeechGenerator; }
+    public TextToSpeech getTextToSpeech() { return this.tts; }
 }

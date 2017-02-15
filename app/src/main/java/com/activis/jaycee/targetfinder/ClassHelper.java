@@ -29,7 +29,7 @@ import static java.lang.Math.sqrt;
 
 public class ClassHelper
 {
-    mQuaternion getQuaternionToTarget(mVector targetPosition, TangoPoseData tangoPoseData)
+    static mQuaternion getQuaternionToTarget(mVector targetPosition, TangoPoseData tangoPoseData)
     {
         mQuaternion tangoOrientation = new mQuaternion(tangoPoseData.rotation[0], tangoPoseData.rotation[1], tangoPoseData.rotation[2], tangoPoseData.rotation[3]);
         tangoOrientation.normalise();
