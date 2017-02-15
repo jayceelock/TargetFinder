@@ -69,6 +69,7 @@ public class RunnableSoundGenerator implements Runnable
     {
         this.tangoPose = tangoPose;
 
+        /* Prevent the runnable from restarting before new data is written to sound lib */
         if(!running)
         {
             this.run();
