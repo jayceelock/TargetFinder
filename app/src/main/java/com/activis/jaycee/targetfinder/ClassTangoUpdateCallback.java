@@ -2,13 +2,17 @@ package com.activis.jaycee.targetfinder;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
+import com.google.atap.tangoservice.TangoPointCloudData;
 import com.google.atap.tangoservice.TangoPoseData;
 
 class ClassTangoUpdateCallback extends Tango.TangoUpdateCallback
 {
+    private static final String TAG = ClassTangoUpdateCallback.class.getSimpleName();
+
     private ActivityCamera activityCamera;
 
     ClassTangoUpdateCallback(Context context)
@@ -33,7 +37,14 @@ class ClassTangoUpdateCallback extends Tango.TangoUpdateCallback
     @Override
     public void onPoseAvailable(TangoPoseData pose)
     {
+        // Log.d(TAG, "In callback");
+
         activityCamera.getRunnableSoundGenerator().setTangoPose(pose);
-        activityCamera.getRunnableSpeechGenerator().setTangoPose(pose);
+        //activityCamera.getRunnableSpeechGenerator().setTangoPose(pose);
+    }
+
+    @Override
+    public void onPointCloudAvailable(TangoPointCloudData couldData)
+    {
     }
 }

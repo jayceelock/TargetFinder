@@ -2,12 +2,14 @@ package com.activis.jaycee.targetfinder;
 
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
 import com.google.atap.tangoservice.TangoPoseData;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.tan;
+import static java.lang.Thread.sleep;
 
 public class RunnableSpeechGenerator implements Runnable
 {
@@ -77,6 +79,16 @@ public class RunnableSpeechGenerator implements Runnable
                 // Right
                 tts.speak("Right", TextToSpeech.QUEUE_ADD, null);
             }
+        }
+
+        try
+        {
+            sleep((long) activityCamera.getInterfaceParameters().getVoiceTiming());
+        }
+
+        catch(InterruptedException e)
+        {
+            Log.e(TAG, "Error in thread sleep: " + e);
         }
 
         running = false;

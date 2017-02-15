@@ -2,8 +2,8 @@
 #define SOUND_GENERATOR
 
 #define SOUNDLOG "SoundGenerator.cpp"
-#define NUM_BUFFERS 4
-#define SOUND_LEN 0.5
+#define NUM_BUFFERS 1
+#define SOUND_LEN 0.2
 #define SAMPLE_RATE 44100
 
 #include <jni.h>
@@ -43,6 +43,7 @@ namespace SoundGeneratorSpace
     private:
         ALuint soundSrc;
         ALuint soundBuf[NUM_BUFFERS];
+        bool playing = false;
     };
 }
 

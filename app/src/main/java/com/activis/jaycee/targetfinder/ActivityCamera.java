@@ -86,6 +86,11 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
                     TangoConfig tangoConfig = tango.getConfig(TangoConfig.CONFIG_TYPE_DEFAULT);
                     tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_AUTORECOVERY, true);
                     tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_COLORCAMERA, true);
+                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_MOTIONTRACKING, true);
+                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_LOWLATENCYIMUINTEGRATION, true);
+                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_SMOOTH_POSE, true);
+                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_DEPTH, true);
+                    tangoConfig.putInt(TangoConfig.KEY_INT_DEPTH_MODE, TangoConfig.TANGO_DEPTH_MODE_POINT_CLOUD);
 
                     try
                     {

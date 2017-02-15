@@ -6,8 +6,6 @@ import android.util.Log;
 import com.google.atap.tangoservice.TangoException;
 import com.google.atap.tangoservice.TangoPoseData;
 
-import static java.lang.Thread.sleep;
-
 public class RunnableSoundGenerator implements Runnable
 {
     private static final String TAG = RunnableSoundGenerator.class.getSimpleName();
@@ -15,8 +13,6 @@ public class RunnableSoundGenerator implements Runnable
     private TangoPoseData tangoPose;
 
     private ActivityCamera activityCamera;
-
-    private boolean running = false;
 
     public RunnableSoundGenerator(Context context)
     {
@@ -57,18 +53,6 @@ public class RunnableSoundGenerator implements Runnable
             tempList[0] = (float)xPositionListener;
 
             JNINativeInterface.play(tempSrc, tempList, gain, pitch);
-
-            try
-            {
-                sleep((long) activityCamera.getInterfaceParameters().getVoiceTiming());
-            }
-
-            catch(InterruptedException e)
-            {
-                Log.e(TAG, "Error in thread sleep: " + e);
-            }
-
-            running = false;
         }
 
         catch(TangoException e)
@@ -80,12 +64,6 @@ public class RunnableSoundGenerator implements Runnable
     public void setTangoPose(TangoPoseData tangoPose)
     {
         this.tangoPose = tangoPose;
-
-        /* Prevent the runnable from restarting before new data is written to sound lib */
-        if(!running)
-        {
-            this.run();
-            running = true;
-        }
+        this.run();
     }
 }

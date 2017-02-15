@@ -57,6 +57,8 @@ namespace SoundGeneratorSpace
     {
         alGenBuffers(NUM_BUFFERS, soundBuf);
         alGenSources(1, &soundSrc);
+        playing = false;
+
         __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "Started sound");
 
         return 0;
@@ -66,6 +68,7 @@ namespace SoundGeneratorSpace
     {
         alDeleteBuffers(NUM_BUFFERS, soundBuf);
         alDeleteSources(1, &soundSrc);
+        playing = false;
 
         __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "Ended Sound.");
 
@@ -106,9 +109,13 @@ namespace SoundGeneratorSpace
         alSource3f(soundSrc, AL_POSITION, lSrc[0], lList[1], lList[2]);
         alSource3f(soundSrc, AL_VELOCITY, 0.f, 0.f, 0.f);
 
-        if(!sourcePlaying())
+        alSourcei(soundSrc, AL_LOOPING, AL_FALSE);
+
+        //if(!sourcePlaying())
+        if(!playing)
         {
             startPlay(pitch);
+            playing = true;
         }
 
         else
@@ -126,7 +133,7 @@ namespace SoundGeneratorSpace
          * 4 . Play source
          */
 
-        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / (NUM_BUFFERS - 1);
+        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / NUM_BUFFERS;
         for(int i = 0; i < NUM_BUFFERS; i ++)
         {
             int* samples = generateSoundWave(bufferSize, pitch);
@@ -163,7 +170,7 @@ namespace SoundGeneratorSpace
             return;
         }
 
-        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / (NUM_BUFFERS - 1);
+        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / NUM_BUFFERS;
 
         while(processedBuffers --)
         {
