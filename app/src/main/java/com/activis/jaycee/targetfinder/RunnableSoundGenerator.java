@@ -14,6 +14,8 @@ public class RunnableSoundGenerator implements Runnable
 
     private ActivityCamera activityCamera;
 
+    private boolean running = false;
+
     public RunnableSoundGenerator(Context context)
     {
         activityCamera = (ActivityCamera)context;
@@ -53,17 +55,24 @@ public class RunnableSoundGenerator implements Runnable
             tempList[0] = (float)xPositionListener;
 
             JNINativeInterface.play(tempSrc, tempList, gain, pitch);
+
+            running = false;
         }
 
         catch(TangoException e)
         {
-            Log.e(TAG, "Error getting the Tango pose.");
+            Log.e(TAG, "Error getting the Tango pose: " + e);
         }
     }
 
     public void setTangoPose(TangoPoseData tangoPose)
     {
         this.tangoPose = tangoPose;
-        this.run();
+
+        if(!running)
+        {
+            this.run();
+            running = true;
+        }
     }
 }

@@ -126,7 +126,7 @@ namespace SoundGeneratorSpace
          * 4 . Play source
          */
 
-        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / NUM_BUFFERS;
+        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / (NUM_BUFFERS - 1);
         for(int i = 0; i < NUM_BUFFERS; i ++)
         {
             int* samples = generateSoundWave(bufferSize, pitch);
@@ -163,7 +163,7 @@ namespace SoundGeneratorSpace
             return;
         }
 
-        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / NUM_BUFFERS;
+        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / (NUM_BUFFERS - 1);
 
         while(processedBuffers --)
         {
