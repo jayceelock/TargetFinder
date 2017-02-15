@@ -126,7 +126,7 @@ namespace SoundGeneratorSpace
          * 4 . Play source
          */
 
-        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / (NUM_BUFFERS - 1);
+        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / NUM_BUFFERS;
         for(int i = 0; i < NUM_BUFFERS; i ++)
         {
             int* samples = generateSoundWave(bufferSize, pitch);
@@ -156,14 +156,14 @@ namespace SoundGeneratorSpace
 
         alGetSourcei(soundSrc, AL_BUFFERS_PROCESSED, &processedBuffers);
 
-        if(processedBuffers <= 0)
+        if(processedBuffers < 1)
         {
-            __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "Not buffers to update");
+            __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "No buffers to update");
 
             return;
         }
 
-        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / (NUM_BUFFERS - 1);
+        size_t bufferSize = SOUND_LEN * SAMPLE_RATE / NUM_BUFFERS;
 
         while(processedBuffers --)
         {

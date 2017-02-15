@@ -5,12 +5,13 @@ import android.opengl.GLSurfaceView;
 
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
+import com.google.atap.tangoservice.TangoPoseData;
 
-public class ClassTangoUpdateCallback extends Tango.TangoUpdateCallback
+class ClassTangoUpdateCallback extends Tango.TangoUpdateCallback
 {
     private ActivityCamera activityCamera;
 
-    public ClassTangoUpdateCallback(Context context)
+    ClassTangoUpdateCallback(Context context)
     {
         this.activityCamera = (ActivityCamera)context;
     }
@@ -27,5 +28,11 @@ public class ClassTangoUpdateCallback extends Tango.TangoUpdateCallback
             activityCamera.getFrameAvailableTangoThread().set(true);
             activityCamera.getSurfaceView().requestRender();
         }
+    }
+
+    @Override
+    public void onPoseAvailable(TangoPoseData pose)
+    {
+        activityCamera.getRunnableSoundGenerator().setTangoPose(pose);
     }
 }

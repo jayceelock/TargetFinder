@@ -38,6 +38,8 @@ public class ActivityCamera extends Activity
     private ClassRenderer renderer;
 
     private ClassFrameCallback sceneFrameCallback = new ClassFrameCallback(ActivityCamera.this);
+    private RunnableSoundGenerator runnableSoundGenerator = new RunnableSoundGenerator(ActivityCamera.this);
+    private ClassInterfaceParameters interfaceParameters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,6 +49,8 @@ public class ActivityCamera extends Activity
 
         surfaceView = (RajawaliSurfaceView)findViewById(R.id.surfaceview);
         renderer = new ClassRenderer(this);
+
+        interfaceParameters = new ClassInterfaceParameters(ActivityCamera.this);
 
         renderer.getCurrentScene().registerFrameCallback(sceneFrameCallback);
         surfaceView.setSurfaceRenderer(renderer);
@@ -147,4 +151,6 @@ public class ActivityCamera extends Activity
     public int getConnectedTextureIdGlThread() { return this.connectedTextureIdGlThread; }
     public void setConnectedTextureIdGlThread(int connectedTextureIdGlThread) { this.connectedTextureIdGlThread = connectedTextureIdGlThread; }
     public RajawaliSurfaceView getSurfaceView() { return this.surfaceView; }
+    public ClassInterfaceParameters getInterfaceParameters() { return this.interfaceParameters; }
+    public RunnableSoundGenerator getRunnableSoundGenerator() { return this.runnableSoundGenerator; }
 }

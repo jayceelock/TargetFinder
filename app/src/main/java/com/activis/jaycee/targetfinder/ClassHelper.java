@@ -22,11 +22,227 @@ import org.rajawali3d.math.Matrix4;
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 
+import static java.lang.Math.acos;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.sqrt;
+
+public class ClassHelper
+{
+    mQuaternion getQuaternionToTarget(mVector targetPosition, TangoPoseData tangoPoseData)
+    {
+        mQuaternion tangoOrientation = new mQuaternion(tangoPoseData.rotation[0], tangoPoseData.rotation[1], tangoPoseData.rotation[2], tangoPoseData.rotation[3]);
+        tangoOrientation.normalise();
+
+        mVector tangoPosition = new mVector(tangoPoseData.translation[0], tangoPoseData.translation[1], tangoPoseData.translation[2]);
+
+        mVector tangoForwardVector = new mVector(0, 1, 0);
+        mVector tangoForwardFacingVector = tangoForwardVector.rotateVector(tangoOrientation);
+        tangoForwardFacingVector.normalise();
+
+        // Rotate the vector to allign with global coord system
+        mQuaternion rotate = new mQuaternion(new mVector(0, 1, 0), Math.PI);
+        rotate.normalise();
+        tangoForwardFacingVector = tangoForwardFacingVector.rotateVector(rotate);
+        tangoForwardFacingVector.normalise();
+
+        mVector vectorToTarget = new mVector(targetPosition.x - tangoPosition.x, targetPosition.y - tangoPosition.z, -targetPosition.z - tangoPosition.y);
+        vectorToTarget.normalise();
+
+        mVector rotationAxis = tangoForwardFacingVector.crossProduct(vectorToTarget);
+        rotationAxis.normalise();
+        double rotationAngle = tangoForwardFacingVector.invDotProduct(vectorToTarget);
+
+        mVector test = rotationAxis.crossProduct(tangoForwardFacingVector);
+        if(test.dotProduct(vectorToTarget) > 0)
+        {
+            rotationAngle = -rotationAngle;
+        }
+
+        mQuaternion requiredQuaternion = new mQuaternion(rotationAxis, rotationAngle);
+        requiredQuaternion.normalise();
+
+        return requiredQuaternion;
+    }
+
+    static double getElevationAngle(mVector targetPosition, TangoPoseData tangoPoseData)
+    {
+        mQuaternion tangoOrientation = new mQuaternion(tangoPoseData.rotation[0], tangoPoseData.rotation[1], tangoPoseData.rotation[2], tangoPoseData.rotation[3]);
+        tangoOrientation.normalise();
+
+        mVector tangoPosition = new mVector(tangoPoseData.translation[0], tangoPoseData.translation[1], tangoPoseData.translation[2]);
+
+        mVector tangoForwardVector = new mVector(0, 0, 1);
+        mVector tangoForwardFacingVector = tangoForwardVector.rotateVector(tangoOrientation);
+        tangoForwardFacingVector.normalise();
+
+        // Rotate the vector to allign with global coord system
+        mQuaternion rotate = new mQuaternion(new mVector(0, 0, 1), Math.PI);
+        rotate.normalise();
+        tangoForwardFacingVector = tangoForwardFacingVector.rotateVector(rotate);
+        tangoForwardFacingVector.normalise();
+
+        mVector vectorToTarget = new mVector(targetPosition.x - tangoPosition.x, targetPosition.y - tangoPosition.z, -targetPosition.z - tangoPosition.y);
+        vectorToTarget.normalise();
+
+        mVector rotationAxis = tangoForwardFacingVector.crossProduct(vectorToTarget);
+        rotationAxis.normalise();
+        double rotationAngle = tangoForwardFacingVector.invDotProduct(vectorToTarget);
+
+        mQuaternion requiredQuaternion = new mQuaternion(rotationAxis, rotationAngle);
+        requiredQuaternion.normalise();
+
+        rotationAngle -= Math.PI;
+
+
+        return -rotationAngle;
+    }
+
+    static double getXPosition(mVector targetPosition, TangoPoseData tangoPoseData)
+    {
+        mQuaternion tangoOrientation = new mQuaternion(tangoPoseData.rotation[0], tangoPoseData.rotation[1], tangoPoseData.rotation[2], tangoPoseData.rotation[3]);
+        tangoOrientation.normalise();
+
+        mVector tangoPosition = new mVector(tangoPoseData.translation[0], tangoPoseData.translation[1], tangoPoseData.translation[2]);
+
+        mVector tangoForwardVector = new mVector(1, 0, 0);
+        mVector tangoForwardFacingVector = tangoForwardVector.rotateVector(tangoOrientation);
+        tangoForwardFacingVector.normalise();
+
+        // Rotate the vector to allign with global coord system
+        mQuaternion rotate = new mQuaternion(new mVector(1, 0, 0), Math.PI);
+        rotate.normalise();
+        tangoForwardFacingVector = tangoForwardFacingVector.rotateVector(rotate);
+        tangoForwardFacingVector.normalise();
+
+        mVector vectorToTarget = new mVector(targetPosition.x - tangoPosition.x, targetPosition.y - tangoPosition.z, -targetPosition.z - tangoPosition.y);
+        vectorToTarget.normalise();
+
+        mVector rotationAxis = tangoForwardFacingVector.crossProduct(vectorToTarget);
+        rotationAxis.normalise();
+        double rotationAngle = tangoForwardFacingVector.invDotProduct(vectorToTarget);
+
+        double distanceToTarget = vectorToTarget.getLength();
+
+        double xDistance = distanceToTarget * cos(rotationAngle);
+
+        return xDistance;
+    }
+}
+
+class mVector
+{
+    double x, y, z;
+    private double length;
+
+    mVector(double x, double y, double z)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+
+        this.length = sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+    }
+
+    void normalise()
+    {
+        this.x /= this.length;
+        this.y /= this.length;
+        this.z /= this.length;
+    }
+
+    double dotProduct(mVector v)
+    {
+        return this.x * v.x + this.y * v.y + this.z * v.z;
+    }
+
+    double invDotProduct(mVector v)
+    {
+        return acos(dotProduct(v));
+    }
+
+    mVector crossProduct(mVector v)
+    {
+        // p x v
+        return new mVector(this.y * v.z - this.z * v.y,
+                this.z * v.x - this.x * v.z,
+                this.x * v.y - this.y * v.x);
+    }
+
+    mVector rotateVector(mQuaternion q)
+    {
+        double x = (1 - 2 * q.y * q.y - 2 * q.z * q.z) * this.x +
+                2 * (q.x * q.y + q.w * q.z) * this.y +
+                2 * (q.x * q.z - q.w * q.y) * this.z;
+        double y = 2 * (q.x * q.y - q.w * q.z) * this.x +
+                (1 - 2 * q.x * q.x - 2 * q.z * q.z) * this.y +
+                2 * (q.y * q.z + q.w * q.x) * this.z;
+        double z = 2 * (q.x * q.z + q.w * q.y) * this.x +
+                2 * (q.y * q.z - q.w * q.x) * this.y +
+                (1 - 2 * q.x * q.x - 2 * q.y * q.y) * this.z;
+
+        return new mVector(x, y, z);
+    }
+
+    double getLength()
+    {
+        return this.length;
+    }
+}
+
+class mQuaternion
+{
+    double x, y, z, w;
+    private double length;
+
+    mQuaternion(mVector v, double angle)
+    {
+        this.x = v.x * sin(angle / 2);
+        this.y = v.y * sin(angle / 2);
+        this.z = v.z * sin(angle / 2);
+        this.w = cos(angle / 2);
+
+        this.length = sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+    }
+
+    mQuaternion(double x, double y, double z, double w)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
+
+        this.length = sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+    }
+
+    void normalise()
+    {
+        this.x /= this.length;
+        this.y /= this.length;
+        this.z /= this.length;
+        this.w /= this.length;
+    }
+
+    public Quaternion getInverse()
+    {
+        return new Quaternion(-this.x / this.length, this.y / this.length, -this.z / this.length, this.w / this.length);
+    }
+
+    public Quaternion multiply(Quaternion q)
+    {
+        // is p * q (in that order)
+        return new Quaternion(this.w * q.x + this.x * q.w - this.y * q.z + this.z * q.y,
+                this.w * q.y + this.x * q.z + this.y * q.w - this.z * q.x,
+                this.w * q.z - this.x * q.y + this.y * q.x + this.z * q.w,
+                this.w * q.w - this.x * q.x - this.y * q.y - this.z * q.z);
+    }
+}
+
 /**
  * Convenient class for calculating transformations from the Tango world to the OpenGL world,
  * using Rajawali specific classes and conventions.
  */
-public final class ClassScenePoseCalculator {
+final class ClassScenePoseCalculator {
     private static final String TAG = ClassScenePoseCalculator.class.getSimpleName();
 
     /**

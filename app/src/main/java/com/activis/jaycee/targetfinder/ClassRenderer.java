@@ -132,4 +132,11 @@ class ClassRenderer extends RajawaliRenderer
 
         Log.i(TAG, "Added marker.");
     }
+
+    public Vector3 getObjectPosition()
+    {
+        Object3D obj = getCurrentScene().getChildrenCopy().get(1);
+
+        return obj.getPosition();
+    }
 }
