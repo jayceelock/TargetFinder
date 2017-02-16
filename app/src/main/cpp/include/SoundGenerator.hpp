@@ -2,8 +2,8 @@
 #define SOUND_GENERATOR
 
 #define SOUNDLOG "SoundGenerator.cpp"
-#define NUM_BUFFERS 3//4
-#define SOUND_LEN 0.4
+#define NUM_BUFFERS 1//4
+#define SOUND_LEN 8
 #define SAMPLE_RATE 44100
 
 #include <jni.h>

@@ -109,8 +109,9 @@ namespace SoundGeneratorSpace
         alSource3f(soundSrc, AL_POSITION, lSrc[0], lList[1], lList[2]);
         alSource3f(soundSrc, AL_VELOCITY, 0.f, 0.f, 0.f);
 
-        alSourcei(soundSrc, AL_LOOPING, AL_FALSE);
+        alSourcei(soundSrc, AL_LOOPING, AL_TRUE);
 
+        float mul = 1.f;
         //if(!sourcePlaying())
         if(!playing)
         {
@@ -120,7 +121,8 @@ namespace SoundGeneratorSpace
 
         else
         {
-            updatePlay(pitch);
+            alSourcef(soundSrc, AL_PITCH, pitch / 512.f);
+            // updatePlay(pitch);
         }
     }
 
@@ -152,7 +154,7 @@ namespace SoundGeneratorSpace
 
             alBufferData(soundBuf[i], AL_FORMAT_MONO16, samples, bufferSize, SAMPLE_RATE);
             free(samples);
-            __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "meh last val: %d", lastVal);
+            //__android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "meh last val: %d", lastVal);
         }
 
         alSourceQueueBuffers(soundSrc, NUM_BUFFERS, soundBuf);
@@ -166,9 +168,9 @@ namespace SoundGeneratorSpace
         /*
          * 1. Check processed buffers
          * 2. For each procesed buffer:
-         *    - Unque buffer
+         *    - Unqueue buffer
          *    - Load new sound data into buffer
-         *    - Reque buffer
+         *    - Requeue buffer
          * 3. Ensure source is playing, restart if needed
          */
 
@@ -183,7 +185,7 @@ namespace SoundGeneratorSpace
 
             return;
         }
-        __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "Updating buffers.");
+        __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "Updating buffers, pitch: %d", (int)pitch);
 
         size_t bufferSize = SOUND_LEN * SAMPLE_RATE / NUM_BUFFERS;
         static short lastVal = 0;
