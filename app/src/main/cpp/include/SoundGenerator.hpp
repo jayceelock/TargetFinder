@@ -2,13 +2,14 @@
 #define SOUND_GENERATOR
 
 #define SOUNDLOG "SoundGenerator.cpp"
-#define NUM_BUFFERS 1
-#define SOUND_LEN 0.2
+#define NUM_BUFFERS 3
+#define SOUND_LEN 5//0.2
 #define SAMPLE_RATE 44100
 
 #include <jni.h>
 #include <malloc.h>
 #include <math.h>
+#include <stdlib.h>
 
 #include <android/log.h>
 
@@ -32,7 +33,7 @@ namespace SoundGeneratorSpace
         bool endSound();
 
         // Sound generating functions
-        int* generateSoundWave(size_t bufferSize, jfloat pitch);
+        short* generateSoundWave(size_t bufferSize, jfloat pitch, short lastVal, bool onUpSwing);
         void play(JNIEnv* env, jfloatArray src, jfloatArray list, jfloat gain, jfloat pitch);
         void startPlay(jfloat pitch);
         void updatePlay(jfloat pitch);

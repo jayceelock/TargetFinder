@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">VirtualCaneV2</string>
+    <string name="app_name">TargetFinder</string>
 
     <string name="pref_file_name">PREFERENCES</string>
 
