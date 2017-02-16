@@ -87,40 +87,40 @@ namespace SoundGeneratorSpace
         env->GetFloatArrayRegion(src, 0, srcLen, lSrc);
         env->GetFloatArrayRegion(list, 0, listLen, lList);
 
+        // Set source properties
+        alSourcef(soundSrc, AL_GAIN, gain);
+
+        // Check to see if target is centre of screen: fix for OpenAL not handling centre sounds properly
+        if(sqrt((lList[0] - lSrc[0]) * (lList[0] - lSrc[0])) < 0.1)
+        {
+            // Set listener position and orientation
+            alListener3f(AL_POSITION, 0.f, lList[1], lList[2]);
+        }
+        else
+        {
+            alListener3f(AL_POSITION, lList[0], lList[1], lList[2]);
+        }
+        alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f);
+
+        float orient[6] = { /*fwd:*/ 0.f, 0.f, -1.f, /*up:*/ 0.f, 1.f, 0.f};
+        alListenerfv(AL_ORIENTATION, orient);
+
+        // Set source position and orientation
+        alSource3f(soundSrc, AL_POSITION, lSrc[0], lList[1], lList[2]);
+        alSource3f(soundSrc, AL_VELOCITY, 0.f, 0.f, 0.f);
+
+        alSourcei(soundSrc, AL_LOOPING, AL_FALSE);
+
         //if(!sourcePlaying())
         if(!playing)
         {
-            // Set source properties
-            alSourcef(soundSrc, AL_GAIN, gain);
-
-            // Check to see if target is centre of screen: fix for OpenAL not handling centre sounds properly
-            if(sqrt((lList[0] - lSrc[0]) * (lList[0] - lSrc[0])) < 0.1)
-            {
-                // Set listener position and orientation
-                alListener3f(AL_POSITION, 0.f, lList[1], lList[2]);
-            }
-            else
-            {
-                alListener3f(AL_POSITION, lList[0], lList[1], lList[2]);
-            }
-            alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f);
-
-            float orient[6] = { /*fwd:*/ 0.f, 0.f, -1.f, /*up:*/ 0.f, 1.f, 0.f};
-            alListenerfv(AL_ORIENTATION, orient);
-
-            // Set source position and orientation
-            alSource3f(soundSrc, AL_POSITION, lSrc[0], lList[1], lList[2]);
-            alSource3f(soundSrc, AL_VELOCITY, 0.f, 0.f, 0.f);
-
-            alSourcei(soundSrc, AL_LOOPING, AL_FALSE);
-
             startPlay(pitch);
             playing = true;
         }
 
         else
         {
-            //updatePlay(pitch);
+            updatePlay(pitch);
         }
     }
 
@@ -141,7 +141,7 @@ namespace SoundGeneratorSpace
         {
             short* samples = generateSoundWave(bufferSize, pitch, lastVal, onUpSwing);
             lastVal = samples[bufferSize - 1];
-            if(lastVal - samples[bufferSize - 2] > 0.f)
+            if(lastVal - samples[bufferSize - 2] > 0)
             {
                 onUpSwing = true;
             }
@@ -179,26 +179,38 @@ namespace SoundGeneratorSpace
 
         if(processedBuffers < 1)
         {
-            __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "No buffers to update");
+            // __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "No buffers to update");
 
             return;
         }
         __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "Updating buffers.");
 
         size_t bufferSize = SOUND_LEN * SAMPLE_RATE / NUM_BUFFERS;
-        // SORT //
-        short lastVal = 0;
+        static short lastVal = 0;
+        static bool onUpSwing = false;
 
         while(processedBuffers --)
         {
             /* Fill samples before unqueing */
-            short* samples = generateSoundWave(bufferSize, pitch, lastVal, true);
-
+            short* samples = generateSoundWave(bufferSize, pitch, lastVal, onUpSwing);
             alSourceUnqueueBuffers(soundSrc, 1, &buffer);
 
             alBufferData(buffer, AL_FORMAT_MONO16, samples, bufferSize, SAMPLE_RATE);
 
             alSourceQueueBuffers(soundSrc, 1, &buffer);
+
+            /* Prep for next update */
+            lastVal = samples[bufferSize - 1];
+            if(lastVal - samples[bufferSize - 2] > 0)
+            {
+                onUpSwing = true;
+            }
+            else
+            {
+                onUpSwing = false;
+            }
+            __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "meh last val: %d", lastVal);
+
             free(samples);
         }
 
@@ -244,7 +256,7 @@ namespace SoundGeneratorSpace
                 samples[i] = 32760 * sin(phi * i - phase + M_PI);
             }
 
-            if(i > 73450 || i < 50)
+            if(i > bufferSize - 5 || i < 5)
             {
                 __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "%d %f", samples[i], phase);
             }
