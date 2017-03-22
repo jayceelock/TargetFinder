@@ -37,14 +37,9 @@ class ClassTangoUpdateCallback extends Tango.TangoUpdateCallback
     @Override
     public void onPoseAvailable(TangoPoseData pose)
     {
-        // Log.d(TAG, "In callback");
-
         activityCamera.getRunnableSoundGenerator().setTangoPose(pose);
-        //activityCamera.getRunnableSpeechGenerator().setTangoPose(pose);
     }
 
     @Override
-    public void onPointCloudAvailable(TangoPointCloudData couldData)
-    {
-    }
+    public void onPointCloudAvailable(TangoPointCloudData couldData) { }
 }

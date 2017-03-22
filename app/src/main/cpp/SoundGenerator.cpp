@@ -78,8 +78,8 @@ namespace SoundGeneratorSpace
     void SoundGenerator::play(JNIEnv *env, jfloatArray src, jfloatArray list, jfloat gain, jfloat pitch)
     {
         // Get source and listener coords and write to JArray
-        jsize srcLen = env-> GetArrayLength(src);
-        jsize listLen = env-> GetArrayLength(list);
+        jsize srcLen = env->GetArrayLength(src);
+        jsize listLen = env->GetArrayLength(list);
 
         jfloat* lSrc = new float[srcLen];
         jfloat* lList = new float[listLen];
@@ -111,9 +111,7 @@ namespace SoundGeneratorSpace
 
         alSourcei(soundSrc, AL_LOOPING, AL_TRUE);
 
-        float mul = 1.f;
-        //if(!sourcePlaying())
-        if(!playing)
+        if(!sourcePlaying())
         {
             startPlay(pitch);
             playing = true;
@@ -122,7 +120,6 @@ namespace SoundGeneratorSpace
         else
         {
             alSourcef(soundSrc, AL_PITCH, pitch / 512.f);
-            // updatePlay(pitch);
         }
     }
 
@@ -154,7 +151,6 @@ namespace SoundGeneratorSpace
 
             alBufferData(soundBuf[i], AL_FORMAT_MONO16, samples, bufferSize, SAMPLE_RATE);
             free(samples);
-            //__android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "meh last val: %d", lastVal);
         }
 
         alSourceQueueBuffers(soundSrc, NUM_BUFFERS, soundBuf);

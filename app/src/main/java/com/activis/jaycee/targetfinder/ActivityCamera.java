@@ -5,6 +5,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
@@ -44,6 +45,7 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
     private RunnableSpeechGenerator runnableSpeechGenerator = new RunnableSpeechGenerator(ActivityCamera.this);
     private ClassInterfaceParameters interfaceParameters;
     private ClassRenderer renderer;
+    private ClassHelper helper = new ClassHelper(ActivityCamera.this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -168,6 +170,22 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
         {
             tts.setLanguage(Locale.UK);
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        int action = event.getAction();
+
+        switch(action)
+        {
+            case MotionEvent.ACTION_DOWN:
+                // metrics.updateTargetPosition(currentTarget);
+                renderer.updateTarget(helper.selectRandomTarget());
+                break;
+        }
+
+        return true;
     }
 
     public Tango getTango(){ return this.tango; }

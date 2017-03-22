@@ -15,6 +15,8 @@
  */
 package com.activis.jaycee.targetfinder;
 
+import android.util.Log;
+
 import com.google.atap.tangoservice.TangoPoseData;
 
 import org.rajawali3d.math.Matrix;
@@ -22,13 +24,33 @@ import org.rajawali3d.math.Matrix4;
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import static java.lang.Math.acos;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
 
-public class ClassHelper
+class ClassHelper
 {
+    private static final String TAG = ClassHelper.class.getSimpleName();
+    private static final int NUM_POINTS_PER_QUAD = 100;
+
+    private ActivityCamera activityCamera;
+
+    private ArrayList<double[]> targetList = generateRandomTargets();
+
+    private int topLeftCounter = 0;
+    private int topRightCounter = 0;
+    private int bottomLeftCounter = 0;
+    private int bottomRightCounter = 0;
+
+    public ClassHelper(ActivityCamera activityCamera)
+    {
+        this.activityCamera = activityCamera;
+    }
+
     static mQuaternion getQuaternionToTarget(mVector targetPosition, TangoPoseData tangoPoseData)
     {
         mQuaternion tangoOrientation = new mQuaternion(tangoPoseData.rotation[0], tangoPoseData.rotation[1], tangoPoseData.rotation[2], tangoPoseData.rotation[3]);
@@ -118,8 +140,6 @@ public class ClassHelper
         mVector vectorToTarget = new mVector(targetPosition.x - tangoPosition.x, targetPosition.y - tangoPosition.z, -targetPosition.z - tangoPosition.y);
         vectorToTarget.normalise();
 
-        mVector rotationAxis = tangoForwardFacingVector.crossProduct(vectorToTarget);
-        rotationAxis.normalise();
         double rotationAngle = tangoForwardFacingVector.invDotProduct(vectorToTarget);
 
         double distanceToTarget = vectorToTarget.getLength();
@@ -127,6 +147,109 @@ public class ClassHelper
         double xDistance = distanceToTarget * cos(rotationAngle);
 
         return xDistance;
+    }
+
+    public double[] selectRandomTarget()
+    {
+        double[] target = new double[3];
+
+        Random randomNumberGenerator = new Random();
+
+        while (topLeftCounter < 7 || topRightCounter < 7 || bottomLeftCounter < 7 || bottomRightCounter < 7)
+        {
+            // Log.d(TAG, "In loop");
+            int quad = randomNumberGenerator.nextInt((4 - 0)) + 0;
+            // Log.d(TAG, String.format("Quad number: %d", quad));
+            Log.d(TAG, String.format("tLeft tRight bLeft bRight: %d %d %d %d", topLeftCounter, topRightCounter, bottomLeftCounter, bottomRightCounter));
+
+            switch (quad)
+            {
+                case 0:
+                    if (topLeftCounter > 6) // 8 iterations
+                    {
+                        continue;
+                    }
+                    topLeftCounter++;
+                    Log.d(TAG, String.format("Spawning topLeft, num: %d", topLeftCounter));
+                    return targetList.get(randomNumberGenerator.nextInt((quad + 1) * 100 - quad * 100 - 1) + quad * 100);
+                case 1:
+                    if (topRightCounter > 6)
+                    {
+                        continue;
+                    }
+                    topRightCounter++;
+                    Log.d(TAG, String.format("Spawning topRight, num: %d", topRightCounter));
+                    return targetList.get(randomNumberGenerator.nextInt((quad + 1) * 100 - quad * 100 - 1) + quad * 100);
+                case 2:
+                    if (bottomLeftCounter > 6)
+                    {
+                        continue;
+                    }
+                    bottomLeftCounter++;
+                    Log.d(TAG, String.format("Spawning bottomLeft, num: %d", bottomLeftCounter));
+                    return targetList.get(randomNumberGenerator.nextInt((quad + 1) * 100 - quad * 100 - 1) + quad * 100);
+                case 3:
+                    if (bottomRightCounter > 6)
+                    {
+                        continue;
+                    }
+                    bottomRightCounter++;
+                    Log.d(TAG, String.format("Spawning bottomRight, num: %d", bottomRightCounter));
+                    return targetList.get(randomNumberGenerator.nextInt((quad + 1) * 100 - quad * 100 - 1) + quad * 100);
+            }
+        }
+
+        if (!(topLeftCounter < 7 || topRightCounter < 7 || bottomLeftCounter < 7 || bottomRightCounter < 7))
+        {
+            activityCamera.finish();
+        }
+
+        return target;
+    }
+
+    public ArrayList<double[]> generateRandomTargets()
+    {
+        ArrayList<double[]> targets = new ArrayList<double[]>();
+
+        /*
+        Divide screen into 4 quadrants and populate with equal amounts of random waypoints
+         */
+
+        Random randomNumberGenerator = new Random();
+
+        // Top left quad
+        for(int i = 0; i < NUM_POINTS_PER_QUAD; i ++)
+        {
+            double[] target = {-1.5 + (0 - (-1.5)) * randomNumberGenerator.nextDouble(),
+                    0 + (0.75 - 0) * randomNumberGenerator.nextDouble(), -2.0};
+            targets.add(target);
+        }
+
+        // Top right quad
+        for(int i = 0; i < NUM_POINTS_PER_QUAD; i ++)
+        {
+            double[] target = {0 + (1.5  - 0) * randomNumberGenerator.nextDouble(),
+                    0 + (0.75 - 0) * randomNumberGenerator.nextDouble(), -2.0};
+            targets.add(target);
+        }
+
+        // Bottom left quad
+        for(int i = 0; i < NUM_POINTS_PER_QUAD; i ++)
+        {
+            double[] target = {-1.5  + (0 - (-1.5)) * randomNumberGenerator.nextDouble(),
+                    -0.75 + (0 - 0.75) * randomNumberGenerator.nextDouble(), -2.0};
+            targets.add(target);
+        }
+
+        // Bottom right quad
+        for(int i = 0; i < NUM_POINTS_PER_QUAD; i ++)
+        {
+            double[] target = {0 + (1.5  - 0) * randomNumberGenerator.nextDouble(),
+                    -0.75 + (0 - 0.75) * randomNumberGenerator.nextDouble(), -2.0};
+            targets.add(target);
+        }
+
+        return targets;
     }
 }
 
@@ -237,6 +360,8 @@ class mQuaternion
                 this.w * q.w - this.x * q.x - this.y * q.y - this.z * q.z);
     }
 }
+
+
 
 /**
  * Convenient class for calculating transformations from the Tango world to the OpenGL world,
