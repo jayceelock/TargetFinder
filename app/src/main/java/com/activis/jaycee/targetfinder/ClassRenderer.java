@@ -99,7 +99,7 @@ class ClassRenderer extends RajawaliRenderer
         getCurrentCamera().setProjectionMatrix(projectionMatrix);
     }
 
-    void addChild(double[] coordinate)
+    private void addChild(double[] coordinate)
     {
         /* Clear old objects before adding new one */
         if(ClassRenderer.this.getCurrentScene().getNumChildren() != 0)
@@ -130,7 +130,7 @@ class ClassRenderer extends RajawaliRenderer
 
         ClassRenderer.this.getCurrentScene().addChild(obj);
 
-        Log.i(TAG, "Added marker.");
+        Log.i(TAG, "Initialised marker.");
     }
 
     Vector3 getObjectPosition()

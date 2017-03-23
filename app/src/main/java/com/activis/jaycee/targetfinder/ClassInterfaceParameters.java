@@ -20,8 +20,6 @@ class ClassInterfaceParameters implements Serializable
 
     private int vibrationDelay, voiceTiming;
 
-    private SharedPreferences prefs;
-
     private ActivityCamera activityCamera;
 
     ClassInterfaceParameters(Context context)
@@ -40,7 +38,7 @@ class ClassInterfaceParameters implements Serializable
         String distanceThreshold = context.getString(R.string.pref_name_distance_threshold);
         String voiceTimer = context.getString(R.string.pref_name_voice_timing);
 
-        prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
 
         // If one doesn't exist, none do...not good logic I guess, but I'm lazy
         if(!prefs.contains(context.getString(R.string.pref_name_pitch_high)))
