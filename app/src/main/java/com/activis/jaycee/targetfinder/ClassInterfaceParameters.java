@@ -9,7 +9,7 @@ import java.io.Serializable;
 import static java.lang.Math.acos;
 import static java.lang.Math.sin;
 
-public class ClassInterfaceParameters implements Serializable
+class ClassInterfaceParameters implements Serializable
 {
     private static final String TAG = ClassInterfaceParameters.class.getSimpleName();
 
@@ -24,7 +24,7 @@ public class ClassInterfaceParameters implements Serializable
 
     private ActivityCamera activityCamera;
 
-    public ClassInterfaceParameters(Context context)
+    ClassInterfaceParameters(Context context)
     {
         String PREF_FILE_NAME = context.getString(R.string.pref_file_name);
 
@@ -89,7 +89,7 @@ public class ClassInterfaceParameters implements Serializable
         activityCamera = (ActivityCamera)context;
     }
 
-    public void updatePitchParams(float highLim, float lowLim)
+    void updatePitchParams(float highLim, float lowLim)
     {
         pitchHighLim = highLim;
         pitchLowLim = lowLim;
@@ -98,7 +98,7 @@ public class ClassInterfaceParameters implements Serializable
         pitchIntercept = pitchLowLim - pitchGradient * distLowLimPitch;
     }
 
-    public void updateGainParams(float highLim, float lowLim)
+    void updateGainParams(float highLim, float lowLim)
     {
         gainHighLim = highLim;
         gainLowLim = lowLim;
@@ -107,9 +107,9 @@ public class ClassInterfaceParameters implements Serializable
         gainIntercept = gainLowLim - gainGradient * distLowLimGain;
     }
 
-    public float getPitch(double elevation)
+    float getPitch(double elevation)
     {
-        float pitch = 0.f;
+        float pitch;
 
         // Compensate for the Tango's default position being 90deg upright
         elevation -= Math.PI / 2;
@@ -132,8 +132,6 @@ public class ClassInterfaceParameters implements Serializable
 
             pitch = (float)(Math.pow(2, grad * -elevation + intercept));
         }
-
-        // Log.d(TAG, String.format("elevation: %f pitch: %f", elevation, pitch));
 
         return pitch;
     }
@@ -189,7 +187,7 @@ public class ClassInterfaceParameters implements Serializable
         }
     }
 
-    public float getGain(double distance)
+    float getGain(double distance)
     {
         // Use absolute difference, because you might end up behind the marker
         float diff = (float)Math.sqrt(distance * distance);
@@ -219,5 +217,5 @@ public class ClassInterfaceParameters implements Serializable
     public float[] getGainLimits() { return new float[]{gainLowLim, gainHighLim}; }
     public float[] getPitchLimits() { return new float[]{pitchLowLim, pitchHighLim}; }
     public float getDistanceThreshold() { return distanceThreshold; }
-    public int getVoiceTiming(){ return this.voiceTiming; }
+    int getVoiceTiming(){ return this.voiceTiming; }
 }

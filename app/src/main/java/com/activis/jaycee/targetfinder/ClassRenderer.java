@@ -99,7 +99,7 @@ class ClassRenderer extends RajawaliRenderer
         getCurrentCamera().setProjectionMatrix(projectionMatrix);
     }
 
-    public void addChild(double[] coordinate)
+    void addChild(double[] coordinate)
     {
         /* Clear old objects before adding new one */
         if(ClassRenderer.this.getCurrentScene().getNumChildren() != 0)
@@ -137,7 +137,7 @@ class ClassRenderer extends RajawaliRenderer
     {
         Object3D obj = getCurrentScene().getChildrenCopy().get(1);
 
-        return obj.getPosition();
+        return new Vector3(-obj.getPosition().x, -obj.getPosition().y, obj.getPosition().z);
     }
 
     void updateTarget(double[] position)

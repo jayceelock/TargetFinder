@@ -46,7 +46,7 @@ class ClassHelper
     private int bottomLeftCounter = 0;
     private int bottomRightCounter = 0;
 
-    public ClassHelper(ActivityCamera activityCamera)
+    ClassHelper(ActivityCamera activityCamera)
     {
         this.activityCamera = activityCamera;
     }
@@ -98,8 +98,8 @@ class ClassHelper
         mVector tangoForwardFacingVector = tangoForwardVector.rotateVector(tangoOrientation);
         tangoForwardFacingVector.normalise();
 
-        // Rotate the vector to allign with global coord system
-        mQuaternion rotate = new mQuaternion(new mVector(0, 0, 1), Math.PI);
+        // Rotate the vector to align with global coord system
+        mQuaternion rotate = new mQuaternion(new mVector(0, 1, 0), Math.PI);
         rotate.normalise();
         tangoForwardFacingVector = tangoForwardFacingVector.rotateVector(rotate);
         tangoForwardFacingVector.normalise();
@@ -107,15 +107,9 @@ class ClassHelper
         mVector vectorToTarget = new mVector(targetPosition.x - tangoPosition.x, targetPosition.y - tangoPosition.z, -targetPosition.z - tangoPosition.y);
         vectorToTarget.normalise();
 
-        mVector rotationAxis = tangoForwardFacingVector.crossProduct(vectorToTarget);
-        rotationAxis.normalise();
         double rotationAngle = tangoForwardFacingVector.invDotProduct(vectorToTarget);
 
-        mQuaternion requiredQuaternion = new mQuaternion(rotationAxis, rotationAngle);
-        requiredQuaternion.normalise();
-
         rotationAngle -= Math.PI;
-
 
         return -rotationAngle;
     }
@@ -131,8 +125,8 @@ class ClassHelper
         mVector tangoForwardFacingVector = tangoForwardVector.rotateVector(tangoOrientation);
         tangoForwardFacingVector.normalise();
 
-        // Rotate the vector to allign with global coord system
-        mQuaternion rotate = new mQuaternion(new mVector(1, 0, 0), Math.PI);
+        // Rotate the vector to align with global coord system
+        mQuaternion rotate = new mQuaternion(new mVector(0, 1, 0), Math.PI);
         rotate.normalise();
         tangoForwardFacingVector = tangoForwardFacingVector.rotateVector(rotate);
         tangoForwardFacingVector.normalise();
@@ -144,12 +138,10 @@ class ClassHelper
 
         double distanceToTarget = vectorToTarget.getLength();
 
-        double xDistance = distanceToTarget * cos(rotationAngle);
-
-        return xDistance;
+        return distanceToTarget * cos(rotationAngle);
     }
 
-    public double[] selectRandomTarget()
+    double[] selectRandomTarget()
     {
         double[] target = new double[3];
 
@@ -207,7 +199,7 @@ class ClassHelper
         return target;
     }
 
-    public ArrayList<double[]> generateRandomTargets()
+    ArrayList<double[]> generateRandomTargets()
     {
         ArrayList<double[]> targets = new ArrayList<double[]>();
 

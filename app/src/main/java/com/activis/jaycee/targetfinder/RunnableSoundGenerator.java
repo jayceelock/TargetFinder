@@ -6,7 +6,7 @@ import android.util.Log;
 import com.google.atap.tangoservice.TangoException;
 import com.google.atap.tangoservice.TangoPoseData;
 
-public class RunnableSoundGenerator implements Runnable
+class RunnableSoundGenerator implements Runnable
 {
     private static final String TAG = RunnableSoundGenerator.class.getSimpleName();
 
@@ -14,7 +14,7 @@ public class RunnableSoundGenerator implements Runnable
 
     private ActivityCamera activityCamera;
 
-    public RunnableSoundGenerator(Context context)
+    RunnableSoundGenerator(Context context)
     {
         activityCamera = (ActivityCamera)context;
     }
@@ -29,6 +29,8 @@ public class RunnableSoundGenerator implements Runnable
             double elevationAngle = ClassHelper.getElevationAngle(targetPoseVector, tangoPose);
             double xPositionListener = ClassHelper.getXPosition(targetPoseVector, tangoPose);
             double xPositionSource = activityCamera.getRenderer().getObjectPosition().x;
+
+            Log.d(TAG, String.format("xPos: %f", xPositionListener));
 
             float[] tempSrc = new float[3];
             float[] tempList = new float[3];
@@ -61,7 +63,7 @@ public class RunnableSoundGenerator implements Runnable
         }
     }
 
-    public void setTangoPose(TangoPoseData tangoPose)
+    void setTangoPose(TangoPoseData tangoPose)
     {
         this.tangoPose = tangoPose;
         this.run();
