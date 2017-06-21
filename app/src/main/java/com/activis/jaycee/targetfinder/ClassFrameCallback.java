@@ -64,10 +64,11 @@ class ClassFrameCallback extends ASceneFrameCallback
                 // Calculate the camera color pose at the camera frame update time in
                 // OpenGL engine.
                 TangoPoseData lastFramePose = TangoSupport.getPoseAtTime(rgbTimestampGlThread,
-                        TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE,
+                        TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
                         TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR,
                         TangoSupport.TANGO_SUPPORT_ENGINE_OPENGL,
-                        Surface.ROTATION_0);
+                        TangoSupport.TANGO_SUPPORT_ENGINE_OPENGL,
+                        activityCamera.getDisplayRotation());
                 if (lastFramePose.statusCode == TangoPoseData.POSE_VALID)
                 {
                     // Update the camera pose from the renderer

@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoPoseData;
+import com.projecttango.tangosupport.TangoSupport;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
@@ -18,17 +19,21 @@ import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.ScreenQuad;
 import org.rajawali3d.primitives.Sphere;
-import org.rajawali3d.renderer.RajawaliRenderer;
+import org.rajawali3d.renderer.Renderer;
 
 import javax.microedition.khronos.opengles.GL10;
 
-class ClassRenderer extends RajawaliRenderer
+class ClassRenderer extends Renderer
 {
     private static final String TAG = ClassRenderer.class.getSimpleName();
 
     private ATexture tangoCameraTexture;
 
     private boolean sceneCameraConfigured = false;
+
+    private ScreenQuad backgroundQuad;
+
+    private float[] textureCoords0 = new float[]{0.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F, 0.0F};
 
     ClassRenderer(Context context)
     {
@@ -38,7 +43,8 @@ class ClassRenderer extends RajawaliRenderer
     @Override
     protected void initScene()
     {
-        ScreenQuad backgroundQuad = new ScreenQuad();
+        backgroundQuad = new ScreenQuad();
+        backgroundQuad.getGeometry().setTextureCoords(textureCoords0);
 
         Material tangoCameraMaterial = new Material();
         tangoCameraMaterial.setColorInfluence(0);
@@ -97,6 +103,18 @@ class ClassRenderer extends RajawaliRenderer
     {
         Matrix4 projectionMatrix = ClassScenePoseCalculator.calculateProjectionMatrix(intrinsics.width, intrinsics.height, intrinsics.fx, intrinsics.fy, intrinsics.cx, intrinsics.cy);
         getCurrentCamera().setProjectionMatrix(projectionMatrix);
+    }
+
+    public void updateColorCameraTextureUvGlThread(int rotation)
+    {
+        if (backgroundQuad == null)
+        {
+            backgroundQuad = new ScreenQuad();
+        }
+
+        float[] textureCoords = TangoSupport.getVideoOverlayUVBasedOnDisplayRotation(textureCoords0, rotation);
+        backgroundQuad.getGeometry().setTextureCoords(textureCoords, true);
+        backgroundQuad.getGeometry().reload();
     }
 
     private void addChild(double[] coordinate)

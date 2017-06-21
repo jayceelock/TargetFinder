@@ -1,10 +1,12 @@
 package com.activis.jaycee.targetfinder;
 
 import android.app.Activity;
+import android.hardware.display.DisplayManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 
 import com.google.atap.tangoservice.Tango;
@@ -17,7 +19,7 @@ import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.tangosupport.TangoSupport;
 
-import org.rajawali3d.surface.RajawaliSurfaceView;
+import org.rajawali3d.view.SurfaceView;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -37,7 +39,7 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
     private Tango tango;
     private TangoCameraIntrinsics tangoCameraIntrinsics;
 
-    private RajawaliSurfaceView surfaceView;
+    private SurfaceView surfaceView;
     private TextToSpeech tts;
 
     private ClassFrameCallback sceneFrameCallback = new ClassFrameCallback(ActivityCamera.this);
@@ -47,18 +49,41 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
     private ClassRenderer renderer;
     private ClassHelper helper = new ClassHelper(ActivityCamera.this);
 
+    private int displayRotation = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        surfaceView = (RajawaliSurfaceView)findViewById(R.id.surfaceview);
+        surfaceView = (SurfaceView)findViewById(R.id.surfaceview);
         renderer = new ClassRenderer(this);
 
         interfaceParameters = new ClassInterfaceParameters(ActivityCamera.this);
         tts = new TextToSpeech(getApplicationContext(), this);
 
+        DisplayManager displayManager = (DisplayManager) getSystemService(DISPLAY_SERVICE);
+        if (displayManager != null)
+        {
+            displayManager.registerDisplayListener(new DisplayManager.DisplayListener()
+            {
+                @Override
+                public void onDisplayAdded(int displayId) {  }
+
+                @Override
+                public void onDisplayChanged(final int displayId)
+                {
+                    synchronized (this)
+                    {
+                        setDisplayRotation();
+                    }
+                }
+
+                @Override
+                public void onDisplayRemoved(int displayId) { }
+            }, null);
+        }
 
         renderer.getCurrentScene().registerFrameCallback(sceneFrameCallback);
         surfaceView.setSurfaceRenderer(renderer);
@@ -71,7 +96,6 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
 
         boolean alInit = JNINativeInterface.init();
 
-        surfaceView.onResume();
         surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
         tango = new Tango(ActivityCamera.this, new Runnable()
@@ -83,8 +107,6 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
                 // thread or in the UI thread.
                 synchronized (ActivityCamera.this)
                 {
-                    TangoSupport.initialize();
-
                     TangoConfig tangoConfig = tango.getConfig(TangoConfig.CONFIG_TYPE_DEFAULT);
                     tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_AUTORECOVERY, true);
                     tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_COLORCAMERA, true);
@@ -92,6 +114,7 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
                     tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_LOWLATENCYIMUINTEGRATION, true);
                     tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_SMOOTH_POSE, true);
                     tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_DEPTH, true);
+
                     tangoConfig.putInt(TangoConfig.KEY_INT_DEPTH_MODE, TangoConfig.TANGO_DEPTH_MODE_POINT_CLOUD);
 
                     try
@@ -103,6 +126,8 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
 
                         tango.connect(tangoConfig);
                         tangoConnected = true;
+
+                        TangoSupport.initialize(tango);
                     }
                     catch (TangoOutOfDateException e)
                     {
@@ -188,6 +213,25 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
         return true;
     }
 
+    public void setDisplayRotation()
+    {
+        Display display = getWindowManager().getDefaultDisplay();
+        displayRotation = display.getRotation();
+
+        /* We also need to update the camera texture UV coordinates. This must be run in the OpenGL thread */
+        surfaceView.queueEvent(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (tangoConnected)
+                {
+                    renderer.updateColorCameraTextureUvGlThread(displayRotation);
+                }
+            }
+        });
+    }
+
     public Tango getTango(){ return this.tango; }
     public TangoCameraIntrinsics getTangoCameraIntrinsics() { return this.tangoCameraIntrinsics; }
     public ClassRenderer getRenderer() { return  this.renderer; }
@@ -195,9 +239,10 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
     public AtomicBoolean getFrameAvailableTangoThread() { return this.frameAvailableTangoThread; }
     public int getConnectedTextureIdGlThread() { return this.connectedTextureIdGlThread; }
     public void setConnectedTextureIdGlThread(int connectedTextureIdGlThread) { this.connectedTextureIdGlThread = connectedTextureIdGlThread; }
-    public RajawaliSurfaceView getSurfaceView() { return this.surfaceView; }
+    public SurfaceView getSurfaceView() { return this.surfaceView; }
     public ClassInterfaceParameters getInterfaceParameters() { return this.interfaceParameters; }
     public RunnableSoundGenerator getRunnableSoundGenerator() { return this.runnableSoundGenerator; }
     public RunnableSpeechGenerator getRunnableSpeechGenerator() { return this.runnableSpeechGenerator; }
     public TextToSpeech getTextToSpeech() { return this.tts; }
+    public int getDisplayRotation() { return this.displayRotation; }
 }
