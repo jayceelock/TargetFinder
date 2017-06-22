@@ -1,10 +1,14 @@
 package com.activis.jaycee.targetfinder;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.hardware.display.DisplayManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -96,63 +100,12 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
 
         boolean alInit = JNINativeInterface.init();
 
+        if(checkAndRequestPermissions())
+        {
+            initialiseTango();
+        }
+
         surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-
-        tango = new Tango(ActivityCamera.this, new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                // Synchronize against disconnecting while the service is being used in the OpenGL
-                // thread or in the UI thread.
-                synchronized (ActivityCamera.this)
-                {
-                    TangoConfig tangoConfig = tango.getConfig(TangoConfig.CONFIG_TYPE_DEFAULT);
-                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_AUTORECOVERY, true);
-                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_COLORCAMERA, true);
-                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_MOTIONTRACKING, true);
-                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_LOWLATENCYIMUINTEGRATION, true);
-                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_SMOOTH_POSE, true);
-                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_DEPTH, true);
-
-                    tangoConfig.putInt(TangoConfig.KEY_INT_DEPTH_MODE, TangoConfig.TANGO_DEPTH_MODE_POINT_CLOUD);
-
-                    try
-                    {
-                        ArrayList<TangoCoordinateFramePair> framePairList = new ArrayList<>();
-                        framePairList.add(new TangoCoordinateFramePair(TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE, TangoPoseData.COORDINATE_FRAME_DEVICE));
-
-                        tango.connectListener(framePairList, new ClassTangoUpdateCallback(ActivityCamera.this));
-
-                        tango.connect(tangoConfig);
-                        tangoConnected = true;
-
-                        TangoSupport.initialize(tango);
-                    }
-                    catch (TangoOutOfDateException e)
-                    {
-                        Log.e(TAG, "Tango core out of date, please update: " + e);
-                    }
-
-                    catch (TangoErrorException e)
-                    {
-                        Log.e(TAG, "Could not connect to Tango service: " + e);
-                    }
-                }
-            }
-        });
-
-        runOnUiThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                synchronized (ActivityCamera.this)
-                {
-                    tangoCameraIntrinsics = tango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
-                }
-            }
-        });
     }
 
     @Override
@@ -213,6 +166,78 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
         return true;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+    {
+        if(hasPermissions())
+        {
+            initialiseTango();
+        }
+    }
+
+    public void initialiseTango()
+    {
+        tango = new Tango(ActivityCamera.this, new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                // Synchronize against disconnecting while the service is being used in the OpenGL
+                // thread or in the UI thread.
+                synchronized (ActivityCamera.this)
+                {
+                    TangoConfig tangoConfig = tango.getConfig(TangoConfig.CONFIG_TYPE_DEFAULT);
+                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_AUTORECOVERY, true);
+                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_COLORCAMERA, true);
+                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_MOTIONTRACKING, true);
+                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_LOWLATENCYIMUINTEGRATION, true);
+                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_SMOOTH_POSE, true);
+                    tangoConfig.putBoolean(TangoConfig.KEY_BOOLEAN_DRIFT_CORRECTION, true);
+
+                    try
+                    {
+                        ArrayList<TangoCoordinateFramePair> framePairList = new ArrayList<>();
+                        framePairList.add(new TangoCoordinateFramePair(TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE, TangoPoseData.COORDINATE_FRAME_DEVICE));
+
+                        tango.connectListener(framePairList, new ClassTangoUpdateCallback(ActivityCamera.this));
+
+                        tango.connect(tangoConfig);
+                        tangoConnected = true;
+
+                        TangoSupport.initialize(tango);
+
+                        setDisplayRotation();
+                    }
+                    catch (TangoOutOfDateException e)
+                    {
+                        Log.e(TAG, "Tango core out of date, please update: " + e);
+                    }
+
+                    catch (TangoErrorException e)
+                    {
+                        Log.e(TAG, "Could not connect to Tango service: " + e);
+                    }
+                }
+            }
+        });
+    }
+
+    public boolean checkAndRequestPermissions()
+    {
+        if(hasPermissions())
+        {
+            ActivityCompat.requestPermissions(ActivityCamera.this, new String[]{Manifest.permission.CAMERA}, 0);
+
+            return false;
+        }
+        return true;
+    }
+
+    public boolean hasPermissions()
+    {
+        return ContextCompat.checkSelfPermission(ActivityCamera.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED;
+    }
+
     public void setDisplayRotation()
     {
         Display display = getWindowManager().getDefaultDisplay();
@@ -233,7 +258,6 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
     }
 
     public Tango getTango(){ return this.tango; }
-    public TangoCameraIntrinsics getTangoCameraIntrinsics() { return this.tangoCameraIntrinsics; }
     public ClassRenderer getRenderer() { return  this.renderer; }
     public boolean getTangoConnected() { return this.tangoConnected; }
     public AtomicBoolean getFrameAvailableTangoThread() { return this.frameAvailableTangoThread; }

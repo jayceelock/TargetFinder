@@ -2,7 +2,6 @@ package com.activis.jaycee.targetfinder;
 
 import android.content.Context;
 import android.util.Log;
-import android.view.Surface;
 
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoPoseData;
@@ -40,7 +39,8 @@ class ClassFrameCallback extends ASceneFrameCallback
             // Set-up scene camera projection to match RGB camera intrinsics.
             if (!activityCamera.getRenderer().isSceneCameraConfigured())
             {
-                activityCamera.getRenderer().setProjectionMatrix(activityCamera.getTangoCameraIntrinsics());
+                TangoCameraIntrinsics intrinsics = TangoSupport.getCameraIntrinsicsBasedOnDisplayRotation(TangoCameraIntrinsics.TANGO_CAMERA_COLOR, activityCamera.getDisplayRotation());
+                activityCamera.getRenderer().setProjectionMatrix(intrinsics);
             }
 
             // Connect the camera texture to the OpenGL Texture if necessary

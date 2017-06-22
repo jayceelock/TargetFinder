@@ -13,14 +13,12 @@
         <uses-library
             android:name="com.projecttango.libtango_device2"
             android:required="true"/>
-        <activity android:name=".ActivityMain">
+        <activity android:name=".ActivityCamera"
+                  android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
-        <activity android:name=".ActivityCamera">
         </activity>
     </application>
 

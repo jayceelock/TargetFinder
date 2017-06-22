@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context="com.activis.jaycee.targetfinder.ActivityCamera">
 
-    <org.rajawali3d.surface.SurfaceView
+    <org.rajawali3d.view.SurfaceView
         android:id="@+id/surfaceview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
