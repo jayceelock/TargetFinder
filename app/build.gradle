@@ -37,6 +37,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     apply from: '../version.gradle'
     compile 'org.rajawali3d:rajawali:1.1.777@aar'
     compile "com.google.tango:sdk-base:${release_version}"

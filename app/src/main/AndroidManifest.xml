@@ -3,6 +3,7 @@
           package="com.activis.jaycee.targetfinder">
 
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -13,8 +14,12 @@
         <uses-library
             android:name="com.projecttango.libtango_device2"
             android:required="true"/>
-        <activity android:name=".ActivityCamera"
-                  android:configChanges="orientation|screenSize">
+
+        <activity
+            android:name=".ActivityCamera"
+            android:configChanges="orientation|screenSize">
+        </activity>
+        <activity android:name=".ActivityWelcome">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
