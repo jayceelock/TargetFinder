@@ -70,7 +70,7 @@ public class ClassMetrics
 
     private class WifiDataSend extends AsyncTask<String, Void, Void>
     {
-        private String serverIdAddress = "172.23.156.88";
+        private String serverIdAddress = "10.5.42.163";
         private int connectionPort = 6666;
 
         public WifiDataSend() { }
