@@ -20,7 +20,7 @@ public class ClassMetrics
     private WifiDataSend dataStreamer = null;
 
 
-    private double timestamp, gain, pitch, distance;
+    private double timestamp, pitch;
     private double[] targetPosition = new double[3];
     private TangoPoseData tangoPose;
 
@@ -34,8 +34,6 @@ public class ClassMetrics
                 + String.valueOf(tangoPose.rotation[1]) + DELIMITER
                 + String.valueOf(tangoPose.rotation[2]) + DELIMITER
                 + String.valueOf(tangoPose.rotation[3]) + DELIMITER
-                + String.valueOf(distance) + DELIMITER
-                + String.valueOf(gain) + DELIMITER
                 + String.valueOf(pitch) + DELIMITER
                 + String.valueOf(targetPosition[0]) + DELIMITER
                 + String.valueOf(targetPosition[1]) + DELIMITER
@@ -65,19 +63,9 @@ public class ClassMetrics
         this.targetPosition = targetPosition;
     }
 
-    public void updateGain(double gain)
-    {
-        this.gain = gain;
-    }
-
     public void updatePitch(double pitch)
     {
         this.pitch = pitch;
-    }
-
-    public void updateDistance(double distance)
-    {
-        this.distance = distance;
     }
 
     private class WifiDataSend extends AsyncTask<String, Void, Void>

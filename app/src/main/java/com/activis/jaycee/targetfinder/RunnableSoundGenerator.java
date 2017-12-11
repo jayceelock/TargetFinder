@@ -54,6 +54,8 @@ class RunnableSoundGenerator implements Runnable
             tempSrc[0] = (float)xPositionSource;
             tempList[0] = (float)xPositionListener;
 
+            activityCamera.getMetrics().updatePitch(pitch);
+
             JNINativeInterface.play(tempSrc, tempList, gain, pitch);
         }
 

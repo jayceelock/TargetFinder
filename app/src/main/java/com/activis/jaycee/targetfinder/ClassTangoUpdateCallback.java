@@ -38,8 +38,9 @@ class ClassTangoUpdateCallback extends Tango.TangoUpdateCallback
     public void onPoseAvailable(TangoPoseData pose)
     {
         activityCamera.getRunnableSoundGenerator().setTangoPose(pose);
-    }
+        activityCamera.getMetrics().updateTimeStamp(pose.timestamp);
+        activityCamera.getMetrics().updateTangoPose(pose);
 
-    /*@Override
-    public void onPointCloudAvailable(TangoPointCloudData couldData) { }*/
+        activityCamera.getMetrics().writeWifi();
+    }
 }
