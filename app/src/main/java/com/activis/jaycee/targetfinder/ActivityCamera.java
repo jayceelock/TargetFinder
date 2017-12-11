@@ -41,7 +41,6 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
     private int connectedTextureIdGlThread = INVALID_TEXTURE_ID;
 
     private Tango tango;
-    private TangoCameraIntrinsics tangoCameraIntrinsics;
 
     private SurfaceView surfaceView;
     private TextToSpeech tts;
