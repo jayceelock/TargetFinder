@@ -51,6 +51,7 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
     private ClassInterfaceParameters interfaceParameters;
     private ClassRenderer renderer;
     private ClassHelper helper = new ClassHelper(ActivityCamera.this);
+    private ClassMetrics metrics = new ClassMetrics();
 
     private int displayRotation = 0;
 
@@ -158,7 +159,9 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
         {
             case MotionEvent.ACTION_DOWN:
                 // metrics.updateTargetPosition(currentTarget);
-                renderer.updateTarget(helper.selectRandomTarget());
+                double[] targetPosition = helper.selectRandomTarget();
+                metrics.updateTargetPosition(targetPosition);
+                renderer.updateTarget(targetPosition);
                 break;
         }
 
@@ -268,4 +271,5 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
     public RunnableSpeechGenerator getRunnableSpeechGenerator() { return this.runnableSpeechGenerator; }
     public TextToSpeech getTextToSpeech() { return this.tts; }
     public int getDisplayRotation() { return this.displayRotation; }
+    public ClassMetrics getMetrics() { return this.metrics; }
 }
