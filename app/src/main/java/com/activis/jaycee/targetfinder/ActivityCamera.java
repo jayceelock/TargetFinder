@@ -54,6 +54,7 @@ public class ActivityCamera extends Activity implements TextToSpeech.OnInitListe
     private ClassMetrics metrics = new ClassMetrics();
 
     private int displayRotation = 0;
+    private int selectedPitch = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

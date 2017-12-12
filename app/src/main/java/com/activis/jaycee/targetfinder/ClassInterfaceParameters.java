@@ -206,14 +206,5 @@ class ClassInterfaceParameters implements Serializable
         }
     }
 
-    public void setVibrationDelay(int vibrationDelay)
-    {
-        this.vibrationDelay = vibrationDelay;
-    }
-
-    public int getVibrationDelay() { return vibrationDelay; }
-    public float[] getGainLimits() { return new float[]{gainLowLim, gainHighLim}; }
-    public float[] getPitchLimits() { return new float[]{pitchLowLim, pitchHighLim}; }
-    public float getDistanceThreshold() { return distanceThreshold; }
     int getVoiceTiming(){ return this.voiceTiming; }
 }
