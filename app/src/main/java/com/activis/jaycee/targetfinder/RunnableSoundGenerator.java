@@ -30,7 +30,7 @@ class RunnableSoundGenerator implements Runnable
             double xPositionListener = ClassHelper.getXPosition(targetPoseVector, tangoPose);
             double xPositionSource = activityCamera.getRenderer().getObjectPosition().x;
 
-            Log.d(TAG, String.format("xPos: %f", xPositionListener));
+            // Log.d(TAG, String.format("xPos: %f", xPositionListener));
 
             float[] tempSrc = new float[3];
             float[] tempList = new float[3];

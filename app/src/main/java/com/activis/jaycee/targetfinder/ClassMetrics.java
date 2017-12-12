@@ -19,7 +19,6 @@ public class ClassMetrics
 
     private WifiDataSend dataStreamer = null;
 
-
     private double timestamp, pitch;
     private double[] targetPosition = new double[3];
     private TangoPoseData tangoPose;
@@ -34,11 +33,12 @@ public class ClassMetrics
                 + String.valueOf(tangoPose.rotation[1]) + DELIMITER
                 + String.valueOf(tangoPose.rotation[2]) + DELIMITER
                 + String.valueOf(tangoPose.rotation[3]) + DELIMITER
-                + String.valueOf(pitch) + DELIMITER
+                + String.valueOf(pitch)  + DELIMITER
                 + String.valueOf(targetPosition[0]) + DELIMITER
                 + String.valueOf(targetPosition[1]) + DELIMITER
                 + String.valueOf(targetPosition[2]) + DELIMITER;
 
+        Log.d(TAG, "Before transmit");
         /* WRITE TO WIFI PORT */
         if(dataStreamer == null || dataStreamer.getStatus() != AsyncTask.Status.RUNNING)
         {
@@ -90,6 +90,7 @@ public class ClassMetrics
 
                 BufferedReader bufferedReader = new BufferedReader(new StringReader(strings[0]));
 
+                Log.d(TAG, "Writing to WiFi");
                 while((charsRead = bufferedReader.read(tempBuffer, 0, bufferLen)) != -1)
                 {
                     writer.print(tempBuffer);
