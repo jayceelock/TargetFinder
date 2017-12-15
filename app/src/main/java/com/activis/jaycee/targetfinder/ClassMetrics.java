@@ -38,7 +38,6 @@ public class ClassMetrics
                 + String.valueOf(targetPosition[1]) + DELIMITER
                 + String.valueOf(targetPosition[2]) + DELIMITER;
 
-        Log.d(TAG, "Before transmit");
         /* WRITE TO WIFI PORT */
         if(dataStreamer == null || dataStreamer.getStatus() != AsyncTask.Status.RUNNING)
         {
