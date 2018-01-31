@@ -90,23 +90,27 @@ namespace SoundGeneratorSpace
         // Set source properties
         alSourcef(soundSrc, AL_GAIN, gain);
 
+        float orient[6] = { /*fwd:*/ 0.f, 0.f, -1.f, /*up:*/ 0.f, 1.f, 0.f};
+        alListenerfv(AL_ORIENTATION, orient);
+
         // Check to see if target is centre of screen: fix for OpenAL not handling centre sounds properly
         if(sqrt((lList[0] - lSrc[0]) * (lList[0] - lSrc[0])) < 0.1)
         {
             // Set listener position and orientation
             alListener3f(AL_POSITION, 0.f, lList[1], lList[2]);
+
+            // Set source position and orientation
+            alSource3f(soundSrc, AL_POSITION, 0.f, lList[1], lList[2]);
         }
         else
         {
+            // Set listener position and orientation
             alListener3f(AL_POSITION, lList[0], lList[1], lList[2]);
+
+            // Set source position and orientation
+            alSource3f(soundSrc, AL_POSITION, -lSrc[0], lList[1], lList[2]);
         }
         alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f);
-
-        float orient[6] = { /*fwd:*/ 0.f, 0.f, -1.f, /*up:*/ 0.f, 1.f, 0.f};
-        alListenerfv(AL_ORIENTATION, orient);
-
-        // Set source position and orientation
-        alSource3f(soundSrc, AL_POSITION, lSrc[0], lList[1], lList[2]);
         alSource3f(soundSrc, AL_VELOCITY, 0.f, 0.f, 0.f);
 
         alSourcei(soundSrc, AL_LOOPING, AL_TRUE);
