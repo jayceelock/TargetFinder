@@ -2,7 +2,17 @@
 
 namespace SoundGeneratorSpace
 {
-    SoundGenerator::SoundGenerator() { }
+    SoundGenerator::SoundGenerator()
+    {
+        float note = 16.4;
+        float interval = pow(2, 1/12.f);
+
+        for(int i = 0; i < 120; i ++)
+        {
+            notes[i] = note;
+            note *= interval;
+        }
+    }
     SoundGenerator::~SoundGenerator() { }
 
     bool SoundGenerator::init()
@@ -242,7 +252,7 @@ namespace SoundGeneratorSpace
         short *samples = (short*)malloc(bufferSize * sizeof(short));
         memset(samples, 0, bufferSize);
 
-        float phi = (2.f * float(M_PI) * pitch) / SAMPLE_RATE;
+        float phi = (2.f * float(M_PI) * convertToneToSemitone(pitch)) / SAMPLE_RATE;
 
         /* Calculate phase shift to make the sines of different buffers align */
         float phase = asin(lastVal / 32760.f);
@@ -265,5 +275,21 @@ namespace SoundGeneratorSpace
         }
 
         return samples;
+    }
+
+    short SoundGenerator::convertToneToSemitone(short pitch)
+    {
+        short nPitch = 0;
+
+        for(int i = 0; i < NUM_SEMITONES; i ++)
+        {
+            if(pitch - notes[i] > 0)
+            {
+                nPitch = (short)(notes[i] + 0.5);
+                break;
+            }
+        }
+
+        return nPitch;
     }
 }

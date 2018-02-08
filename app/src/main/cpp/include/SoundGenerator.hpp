@@ -2,9 +2,10 @@
 #define SOUND_GENERATOR
 
 #define SOUNDLOG "SoundGenerator.cpp"
-#define NUM_BUFFERS 1//4
+#define NUM_BUFFERS 1
 #define SOUND_LEN 8
 #define SAMPLE_RATE 44100
+#define NUM_SEMITONES 120
 
 #include <jni.h>
 #include <malloc.h>
@@ -35,6 +36,7 @@ namespace SoundGeneratorSpace
 
         // Sound generating functions
         short* generateSoundWave(size_t bufferSize, jfloat pitch, short lastVal, bool onUpSwing);
+        short convertToneToSemitone(short pitch);
         void play(JNIEnv* env, jfloatArray src, jfloatArray list, jfloat gain, jfloat pitch);
         void startPlay(jfloat pitch);
         void updatePlay(jfloat pitch);
@@ -46,6 +48,8 @@ namespace SoundGeneratorSpace
         ALuint soundSrc;
         ALuint soundBuf[NUM_BUFFERS];
         bool playing = false;
+
+        float notes[NUM_SEMITONES];
     };
 }
 
