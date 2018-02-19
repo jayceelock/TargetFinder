@@ -36,7 +36,7 @@ namespace SoundGeneratorSpace
 
         // Sound generating functions
         short* generateSoundWave(size_t bufferSize, jfloat pitch, short lastVal, bool onUpSwing);
-        short convertToneToSemitone(short pitch);
+        short convertToneToSemitone(float pitch);
         void play(JNIEnv* env, jfloatArray src, jfloatArray list, jfloat gain, jfloat pitch);
         void startPlay(jfloat pitch);
         void updatePlay(jfloat pitch);

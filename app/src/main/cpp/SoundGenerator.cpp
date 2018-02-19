@@ -125,6 +125,8 @@ namespace SoundGeneratorSpace
 
         alSourcei(soundSrc, AL_LOOPING, AL_TRUE);
 
+        pitch = convertToneToSemitone(pitch);
+
         if(!sourcePlaying())
         {
             startPlay(pitch);
@@ -252,7 +254,7 @@ namespace SoundGeneratorSpace
         short *samples = (short*)malloc(bufferSize * sizeof(short));
         memset(samples, 0, bufferSize);
 
-        float phi = (2.f * float(M_PI) * convertToneToSemitone(pitch)) / SAMPLE_RATE;
+        float phi = (2.f * float(M_PI) * pitch) / SAMPLE_RATE;
 
         /* Calculate phase shift to make the sines of different buffers align */
         float phase = asin(lastVal / 32760.f);
@@ -277,15 +279,16 @@ namespace SoundGeneratorSpace
         return samples;
     }
 
-    short SoundGenerator::convertToneToSemitone(short pitch)
+    short SoundGenerator::convertToneToSemitone(float pitch)
     {
-        short nPitch = 0;
+        float nPitch = 0;
 
         for(int i = 0; i < NUM_SEMITONES; i ++)
         {
-            if(pitch - notes[i] > 0)
+            if(pitch - notes[i] < 0)
             {
                 nPitch = (short)(notes[i] + 0.5);
+                __android_log_print(ANDROID_LOG_DEBUG, SOUNDLOG, "Old pitch: %d New pitch: %d", (int)pitch, (int)nPitch);
                 break;
             }
         }

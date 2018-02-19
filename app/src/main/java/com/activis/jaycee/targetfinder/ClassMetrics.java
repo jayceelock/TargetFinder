@@ -41,9 +41,9 @@ public class ClassMetrics
         /* WRITE TO WIFI PORT */
         if(dataStreamer == null || dataStreamer.getStatus() != AsyncTask.Status.RUNNING)
         {
-            Log.d(TAG, "wifi transmitting");
-            dataStreamer = new WifiDataSend();
-            dataStreamer.execute(wifiString);
+            //Log.d(TAG, "wifi transmitting");
+            //dataStreamer = new WifiDataSend();
+            //dataStreamer.execute(wifiString);
         }
     }
 
