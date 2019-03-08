@@ -57,6 +57,22 @@ class RunnableSoundGenerator implements Runnable
             activityCamera.getMetrics().updatePitch(pitch);
 
             JNINativeInterface.play(tempSrc, tempList, gain, pitch);
+
+            // Interlace second tone to notify user that target is close
+            float targetSize = 0.1f;
+            float volumeGrad = -1/targetSize;
+            float volumeMax = 1f;
+            gain = 0.f;
+            if(elevationAngle - Math.PI/2 < targetSize && elevationAngle > Math.PI/2)
+            {
+                gain = volumeGrad*(float)(elevationAngle - Math.PI/2) + volumeMax;
+            }
+            else if(elevationAngle - Math.PI/2 > -targetSize && elevationAngle < Math.PI/2)
+            {
+                gain = -volumeGrad*(float)(elevationAngle - Math.PI/2) + volumeMax;
+            }
+            JNINativeInterface.playOnTarget(gain, pitch*2);
+            Log.d(TAG, String.format("Elevation angle: %f volume: %f", elevationAngle, gain));
         }
 
         catch(TangoException e)

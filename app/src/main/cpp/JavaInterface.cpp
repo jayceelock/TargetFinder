@@ -32,6 +32,11 @@ Java_com_activis_jaycee_targetfinder_JNINativeInterface_play(JNIEnv* env, jobjec
     return;
 }
 
+JNIEXPORT void JNICALL Java_com_activis_jaycee_targetfinder_JNINativeInterface_playOnTarget(JNIEnv* env, jobject obj, jfloat gain, jfloat pitch)
+{
+    sound.playOnTarget(env, gain, pitch);
+}
+
 #ifdef __cplusplus
 }
 #endif

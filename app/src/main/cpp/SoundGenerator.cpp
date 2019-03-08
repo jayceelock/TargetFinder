@@ -67,7 +67,11 @@ namespace SoundGeneratorSpace
     {
         alGenBuffers(NUM_BUFFERS, soundBuf);
         alGenSources(1, &soundSrc);
-        playing = false;
+
+        alGenBuffers(NUM_BUFFERS, onTargetBuf);
+        alGenSources(1, &onTargetSrc);
+
+        // playing = false;
 
         __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "Started sound");
 
@@ -78,11 +82,34 @@ namespace SoundGeneratorSpace
     {
         alDeleteBuffers(NUM_BUFFERS, soundBuf);
         alDeleteSources(1, &soundSrc);
-        playing = false;
+
+        alDeleteBuffers(NUM_BUFFERS, onTargetBuf);
+        alDeleteSources(1, &onTargetSrc);
+
+        // playing = false;
 
         __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "Ended Sound.");
 
         return 0;
+    }
+
+    void SoundGenerator::playOnTarget(JNIEnv* env, jfloat gain, jfloat pitch)
+    {
+        // Set source properties
+        alSourcef(onTargetSrc, AL_GAIN, gain);
+        alSourcei(onTargetSrc, AL_LOOPING, AL_TRUE);
+        pitch = convertToneToSemitone(pitch);
+
+        if(!isSourcePlaying(onTargetSrc))
+        {
+            startPlay(onTargetSrc, onTargetBuf, pitch);
+            // playing = true;
+        }
+
+        else
+        {
+            alSourcef(onTargetSrc, AL_PITCH, pitch/512.f);
+        }
     }
 
     void SoundGenerator::play(JNIEnv *env, jfloatArray src, jfloatArray list, jfloat gain, jfloat pitch)
@@ -104,7 +131,8 @@ namespace SoundGeneratorSpace
         alListenerfv(AL_ORIENTATION, orient);
 
         // Check to see if target is centre of screen: fix for OpenAL not handling centre sounds properly
-        if(sqrt((lList[0] - lSrc[0]) * (lList[0] - lSrc[0])) < 0.1)
+        //if(sqrt((lList[0] - lSrc[0]) * (lList[0] - lSrc[0])) < 0.2)
+        if(abs(acos((lSrc[2]*lSrc[2] + lSrc[2]*lSrc[2] - (lSrc[0] - lList[0])*(lSrc[0] - lList[0]))/(2*lSrc[2]*lSrc[2]))) < 0.1)
         {
             // Set listener position and orientation
             alListener3f(AL_POSITION, 0.f, lList[1], lList[2]);
@@ -127,19 +155,19 @@ namespace SoundGeneratorSpace
 
         pitch = convertToneToSemitone(pitch);
 
-        if(!sourcePlaying())
+        if(!isSourcePlaying(soundSrc))
         {
-            startPlay(pitch);
-            playing = true;
+            startPlay(soundSrc, soundBuf, pitch);
+            // playing = true;
         }
 
         else
         {
-            alSourcef(soundSrc, AL_PITCH, pitch / 512.f);
+            alSourcef(soundSrc, AL_PITCH, pitch/512.f);
         }
     }
 
-    void SoundGenerator::startPlay(jfloat pitch)
+    void SoundGenerator::startPlay(ALuint src, ALuint *buf, jfloat pitch)
     {
         /*
          * 1. Generate buffers
@@ -165,12 +193,12 @@ namespace SoundGeneratorSpace
                 onUpSwing = false;
             }
 
-            alBufferData(soundBuf[i], AL_FORMAT_MONO16, samples, bufferSize, SAMPLE_RATE);
+            alBufferData(buf[i], AL_FORMAT_MONO16, samples, bufferSize, SAMPLE_RATE);
             free(samples);
         }
 
-        alSourceQueueBuffers(soundSrc, NUM_BUFFERS, soundBuf);
-        alSourcePlay(soundSrc);
+        alSourceQueueBuffers(src, NUM_BUFFERS, buf);
+        alSourcePlay(src);
 
         __android_log_print(ANDROID_LOG_INFO, SOUNDLOG, "Playing");
     }
@@ -228,17 +256,17 @@ namespace SoundGeneratorSpace
             free(samples);
         }
 
-        if(!sourcePlaying())
+        if(!isSourcePlaying(soundSrc))
         {
             alSourcePlay(soundSrc);
         }
     }
 
-    bool SoundGenerator::sourcePlaying()
+    bool SoundGenerator::isSourcePlaying(ALuint src)
     {
         ALint state;
 
-        alGetSourcei(soundSrc, AL_SOURCE_STATE, &state);
+        alGetSourcei(src, AL_SOURCE_STATE, &state);
 
         if(state == AL_PLAYING)
         {

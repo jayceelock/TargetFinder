@@ -9,9 +9,9 @@
 
 #include <jni.h>
 #include <malloc.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
 
 #include <android/log.h>
 
@@ -38,16 +38,22 @@ namespace SoundGeneratorSpace
         short* generateSoundWave(size_t bufferSize, jfloat pitch, short lastVal, bool onUpSwing);
         short convertToneToSemitone(float pitch);
         void play(JNIEnv* env, jfloatArray src, jfloatArray list, jfloat gain, jfloat pitch);
-        void startPlay(jfloat pitch);
+        void playOnTarget(JNIEnv* env, jfloat gain, jfloat pitch);
+        void startPlay(ALuint src, ALuint *buf, jfloat pitch);
         void updatePlay(jfloat pitch);
 
         // Helper functions
-        bool sourcePlaying();
+        bool isSourcePlaying(ALuint src);
 
     private:
         ALuint soundSrc;
         ALuint soundBuf[NUM_BUFFERS];
-        bool playing = false;
+
+        ALuint onTargetSrc;
+        ALuint onTargetBuf[NUM_BUFFERS];
+
+        // bool onTargetPlaying = false;
+        // bool soundPlaying = false;
 
         float notes[NUM_SEMITONES];
     };

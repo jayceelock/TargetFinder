@@ -16,6 +16,7 @@ JNIEXPORT bool JNICALL Java_com_activis_jaycee_targetfinder_JNINativeInterface_i
 JNIEXPORT bool JNICALL Java_com_activis_jaycee_targetfinder_JNINativeInterface_kill(JNIEnv* env, jobject obj);
 
 JNIEXPORT void JNICALL Java_com_activis_jaycee_targetfinder_JNINativeInterface_play(JNIEnv* env, jobject obj, jfloatArray src, jfloatArray list, jfloat gain, jfloat pitch);
+JNIEXPORT void JNICALL Java_com_activis_jaycee_targetfinder_JNINativeInterface_playOnTarget(JNIEnv* env, jobject obj, jfloat gain, jfloat pitch);
 
 #ifdef __cplusplus
 }
